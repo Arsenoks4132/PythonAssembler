@@ -32,6 +32,9 @@ class Interpreter:
             writer = csv.writer(file, delimiter=';')
             writer.writerow(('Регистр', 'Значение'))
             for ind, val in enumerate(self.registers):
+                if val >= 2 ** 18 - 1:
+                    val ^= (1 << 19) - 1
+                    val = -val - 1
                 writer.writerow((f'R{ind}', val))
 
     def load_constant(self):
@@ -54,12 +57,15 @@ class Interpreter:
         c = (self.code & ((1 << 60) - 1)) >> 32
         self.code >>= 64
 
-        self.registers[b] = self.registers[b]
+        self.registers[b] = self.registers[c]
 
     def abs(self):
         b = (self.code & ((1 << 13) - 1)) >> 4
         c = (self.code & ((1 << 41) - 1)) >> 13
         d = (self.code & ((1 << 69) - 1)) >> 41
         self.code >>= 72
-
-        self.registers[c] = abs(self.registers[b + d])
+        val = self.registers[b + d]
+        if val >= 2 ** 18 - 1:
+            val ^= (1 << 19) - 1
+            val += 1
+        self.registers[c] = val

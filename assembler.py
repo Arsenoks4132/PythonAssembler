@@ -11,11 +11,17 @@ class Assembler:
                 self.commands = file.readlines()
         except FileNotFoundError:
             print('Файл не найден')
+        except:
+            print('Ошибка работы с файлом')
 
     def assemble(self, path_to_bin):
         with open(path_to_bin, 'wb') as file:
             for command in self.commands:
-                name, body = command.split(' ', 1)
+                try:
+                    name, body = command.split(' ', 1)
+                except ValueError:
+                    continue
+
                 body = tuple(map(int, body.split()))
                 number = None
                 bits = None
