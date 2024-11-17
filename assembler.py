@@ -1,9 +1,10 @@
-from bitarray import bitarray
+import csv
 
 
 class Assembler:
     def __init__(self, path_to_code, path_to_log=None):
         self.path_to_log = path_to_log
+        self.logs = []
         self.commands = []
         try:
             with open(path_to_code, 'rt') as file:
@@ -16,15 +17,34 @@ class Assembler:
             for command in self.commands:
                 name, body = command.split(' ', 1)
                 body = tuple(map(int, body.split()))
+                number = None
+                bits = None
                 match name:
                     case 'CONST':
-                        file.write(Assembler.load_constant(*body))
+                        number = 5
+                        bits = Assembler.load_constant(*body)
                     case 'READ':
-                        file.write(Assembler.read_memory(*body))
+                        number = 2
+                        bits = Assembler.read_memory(*body)
                     case 'WRITE':
-                        file.write(Assembler.write_memory(*body))
+                        number = 6
+                        bits = Assembler.write_memory(*body)
                     case 'ABS':
-                        file.write(Assembler.abs(*body))
+                        number = 10
+                        bits = Assembler.abs(*body)
+                file.write(bits)
+                self.logs.append([number, body, bits])
+        self.make_log()
+
+    def make_log(self):
+        with open(self.path_to_log, 'w', encoding='utf-8', newline='') as file:
+            writer = csv.writer(file, delimiter=';')
+            writer.writerow(('Тест', 'Команда'))
+            for log in self.logs:
+                key = []
+                for name, param in zip('ABCD', [log[0], *log[1]]):
+                    key.append(f'{name}={param}')
+                writer.writerow(('   '.join(key), ' '.join(hex(i) for i in log[-1])))
 
     @staticmethod
     def load_constant(b, c):
