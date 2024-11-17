@@ -2,7 +2,7 @@ import csv
 
 
 class Assembler:
-    def __init__(self, path_to_code, path_to_log=None):
+    def __init__(self, path_to_code, path_to_log):
         self.path_to_log = path_to_log
         self.logs = []
         self.commands = []
@@ -12,7 +12,7 @@ class Assembler:
         except FileNotFoundError:
             print('Файл не найден')
 
-    def make_bin(self, path_to_bin):
+    def assemble(self, path_to_bin):
         with open(path_to_bin, 'wb') as file:
             for command in self.commands:
                 name, body = command.split(' ', 1)
