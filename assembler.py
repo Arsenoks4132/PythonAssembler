@@ -17,6 +17,9 @@ class Assembler:
     def assemble(self, path_to_bin):
         with open(path_to_bin, 'wb') as file:
             for command in self.commands:
+                if command.startswith('#'):
+                    continue
+
                 try:
                     name, body = command.split(' ', 1)
                 except ValueError:
