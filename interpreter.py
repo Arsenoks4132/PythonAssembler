@@ -32,7 +32,7 @@ class Interpreter:
             writer = csv.writer(file, delimiter=';')
             writer.writerow(('Регистр', 'Значение'))
             for ind, val in enumerate(self.registers):
-                if val >= 2 ** 18 - 1:
+                if val > 2 ** 18 - 1:
                     val ^= (1 << 19) - 1
                     val = -val - 1
                 writer.writerow((f'R{ind}', val))
@@ -65,7 +65,7 @@ class Interpreter:
         d = (self.code & ((1 << 69) - 1)) >> 41
         self.code >>= 72
         val = self.registers[b + d]
-        if val >= 2 ** 18 - 1:
+        if val > 2 ** 18 - 1:
             val ^= (1 << 19) - 1
             val += 1
         self.registers[c] = val
